@@ -9,7 +9,7 @@ const scoreUI = document.getElementById("score");
 const enemyUI = document.getElementById("enemyCount");
 
 const gameOverBox = document.getElementById("gameOver");
-const restartBtm = document.getElementById("restartBtn");
+const restartBtn = document.getElementById("restartBtn");
 
 let keys = {};
 let bullets = [];
@@ -19,7 +19,7 @@ let effects = [];
 let score = 0;
 let running = true;
 
-// PLAYER
+// ---------------- PLAYER ----------------
 
 const player = {
     x: canvas.width / 2,
@@ -29,31 +29,23 @@ const player = {
     speed: 5,
 
     hp: 100,
-
     angle: 0,
 
     draw() {
         ctx.save();
-
         ctx.translate(this.x, this.y);
         ctx.rotate(this.angle);
 
-        // main ship body
-
         ctx.fillStyle = "#38bdf8";
-
         ctx.beginPath();
         ctx.moveTo(28, 0);
         ctx.lineTo(-18, -18);
         ctx.lineTo(-8, 0);
-        ctx.lineTo(-18, -18);
+        ctx.lineTo(-18, 18);
         ctx.closePath();
-
         ctx.fill();
 
-        // little engine low
         ctx.fillStyle = "#f97316";
-
         ctx.beginPath();
         ctx.arc(-15, 0, 5, 0, Math.PI * 2);
         ctx.fill();
@@ -62,23 +54,11 @@ const player = {
     },
 
     move() {
-        if (keys["w"]) {
-            this.y -= this.speed;
-        }
+        if (keys["w"]) this.y -= this.speed;
+        if (keys["s"]) this.y += this.speed;
+        if (keys["a"]) this.x -= this.speed;
+        if (keys["d"]) this.x += this.speed;
 
-        if (keys["s"]) {
-            this.y += this.speed;
-        }
-
-        if (keys["a"]) {
-            this.x -= this.speed;
-        }
-
-        if (keys["d"]) {
-            this.x += this.speed;
-        }
-
-        // Stop leaving screen
         if (this.x < 0) this.x = 0;
         if (this.x > canvas.width) this.x = canvas.width;
 
@@ -87,71 +67,51 @@ const player = {
     }
 };
 
-// Bullet
+// ---------------- BULLET ----------------
 
 function Bullet(x, y, angle) {
     this.x = x;
     this.y = y;
-
     this.size = 5;
 
     this.velX = Math.cos(angle) * 10;
     this.velY = Math.sin(angle) * 10;
 
-    this.draw = function () {
-        ctx.fillStyle = "yellow";
-
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-    };
-
     this.update = function () {
         this.x += this.velX;
         this.y += this.velY;
     };
+
+    this.draw = function () {
+        ctx.fillStyle = "yellow";
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+    };
 }
 
-// Enemy
+// ---------------- ENEMY ----------------
 
 function Enemy() {
+    let side = Math.floor(Math.random() * 4);
 
-    let side= Math.floor(Math.random() * 4);
-
-    if (side === 0){
+    if (side === 0) {
         this.x = 0;
         this.y = Math.random() * canvas.height;
-    }
-
-    else if (side === 1){
+    } else if (side === 1) {
         this.x = canvas.width;
-        this.y = Math.random() * canvas.width;
-    }
-
-    else if (side === 2 ){
+        this.y = Math.random() * canvas.height;
+    } else if (side === 2) {
         this.x = Math.random() * canvas.width;
         this.y = 0;
-    } 
-
-    else {
+    } else {
         this.x = Math.random() * canvas.width;
         this.y = canvas.height;
     }
 
     this.size = Math.random() * 15 + 15;
-
     this.speed = Math.random() * 2 + 1;
-
-    this.color = `hsl(${Math.random() * 360}, 80%, 60%)`;
-
-    this.draw = function () {
-
-        ctx.fillStyle = this.color;
-
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-    };
+    this.color = `hsl(${Math.random() * 360},80%,60%)`;
 
     this.update = function () {
         let angle = Math.atan2(
@@ -162,28 +122,36 @@ function Enemy() {
         this.x += Math.cos(angle) * this.speed;
         this.y += Math.sin(angle) * this.speed;
     };
+
+    this.draw = function () {
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+    };
 }
 
-// Particles
+// ---------------- PARTICLES ----------------
 
 function Particle(x, y, color) {
-
     this.x = x;
     this.y = y;
 
     this.size = Math.random() * 4;
-
     this.dx = (Math.random() - 0.5) * 7;
     this.dy = (Math.random() - 0.5) * 7;
 
     this.life = 100;
-
     this.color = color;
 
+    this.update = function () {
+        this.x += this.dx;
+        this.y += this.dy;
+        this.life -= 3;
+    };
+
     this.draw = function () {
-
         ctx.globalAlpha = this.life / 100;
-
         ctx.fillStyle = this.color;
 
         ctx.beginPath();
@@ -192,19 +160,11 @@ function Particle(x, y, color) {
 
         ctx.globalAlpha = 1;
     };
+}
 
-    this.update = function () {
+// ---------------- STARS ----------------
 
-        this.x += this.dx;
-        this.y += this.dy;
-
-        this.life -= 3;
-    };
-    }
-
-//  Background star
-
-let star = [];
+let stars = [];
 
 for (let i = 0; i < 150; i++) {
     stars.push({
@@ -215,3 +175,163 @@ for (let i = 0; i < 150; i++) {
     });
 }
 
+function drawStars() {
+    for (let star of stars) {
+        ctx.fillStyle = "white";
+
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        star.y += star.speed;
+
+        if (star.y > canvas.height) {
+            star.y = 0;
+            star.x = Math.random() * canvas.width;
+        }
+    }
+}
+
+// ---------------- INPUT ----------------
+
+window.addEventListener("keydown", e => {
+    keys[e.key.toLowerCase()] = true;
+});
+
+window.addEventListener("keyup", e => {
+    keys[e.key.toLowerCase()] = false;
+});
+
+window.addEventListener("mousemove", e => {
+    player.angle = Math.atan2(
+        e.clientY - player.y,
+        e.clientX - player.x
+    );
+});
+
+window.addEventListener("click", () => {
+    if (!running) return;
+
+    bullets.push(new Bullet(player.x, player.y, player.angle));
+});
+
+// ---------------- COLLISION ----------------
+
+function checkCollision(x1, y1, r1, x2, y2, r2) {
+    let dx = x2 - x1;
+    let dy = y2 - y1;
+    return Math.sqrt(dx * dx + dy * dy) < r1 + r2;
+}
+
+// ---------------- SPAWN ----------------
+
+setInterval(() => {
+    if (running) enemies.push(new Enemy());
+}, 1000);
+
+// ---------------- GAME LOOP ----------------
+
+function animate() {
+    if (!running) return;
+
+    requestAnimationFrame(animate);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    drawStars();
+
+    player.move();
+    player.draw();
+
+    // bullets
+    for (let i = bullets.length - 1; i >= 0; i--) {
+        bullets[i].update();
+        bullets[i].draw();
+
+        if (
+            bullets[i].x < 0 ||
+            bullets[i].x > canvas.width ||
+            bullets[i].y < 0 ||
+            bullets[i].y > canvas.height
+        ) {
+            bullets.splice(i, 1);
+        }
+    }
+
+    // enemies (FIXED LOOP)
+    for (let e = enemies.length - 1; e >= 0; e--) {
+
+        enemies[e].update();
+        enemies[e].draw();
+
+        // player hit
+        if (
+            checkCollision(
+                player.x, player.y, player.size,
+                enemies[e].x, enemies[e].y, enemies[e].size
+            )
+        ) {
+            player.hp -= 1;
+            if (player.hp < 0) player.hp = 0;
+
+            healthUI.innerText = player.hp;
+
+            if (player.hp <= 0) {
+                running = false;
+                gameOverBox.style.display = "block";
+            }
+        }
+
+        // bullet hit
+        for (let b = bullets.length - 1; b >= 0; b--) {
+
+            if (
+                checkCollision(
+                    bullets[b].x, bullets[b].y, bullets[b].size,
+                    enemies[e].x, enemies[e].y, enemies[e].size
+                )
+            ) {
+                for (let p = 0; p < 15; p++) {
+                    effects.push(new Particle(
+                        enemies[e].x,
+                        enemies[e].y,
+                        enemies[e].color
+                    ));
+                }
+
+                enemies.splice(e, 1);
+                bullets.splice(b, 1);
+
+                score += 10;
+                scoreUI.innerText = score;
+
+                break;
+            }
+        }
+    }
+
+    // particles
+    for (let i = effects.length - 1; i >= 0; i--) {
+        effects[i].update();
+        effects[i].draw();
+
+        if (effects[i].life <= 0) {
+            effects.splice(i, 1);
+        }
+    }
+
+    enemyUI.innerText = enemies.length;
+}
+
+animate();
+
+// restart
+restartBtn.addEventListener("click", () => {
+    location.reload();
+});
+
+// resize fix
+window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
