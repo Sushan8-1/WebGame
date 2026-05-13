@@ -37,4 +37,77 @@ canvas{
     background: rgba(255, 255, 255, 0.08);
 
     border: 1px solid ;
+
+    color: white;
+
+    font-size: 17px;
+
+    min-width: 140px;
+
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.box span{
+    font-weight: bold;
+}
+
+/* GAME OVER SCREEN */
+
+#gameOver{
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    text-align: center;
+
+    color: white;
+
+    z-index: 100;
+
+    display: none;
+}
+
+#gameOver h1{
+    font-size: 85px;
+
+    color: #ef4444;
+
+    text-shadow: 0 0 20px rgba(239, 68, 68, 0.7);
+
+    margin-bottom: 10px;
+}
+
+#game0ver p{
+    font-size: 20px;
+
+    opacity: 0.8;
+
+    margin-bottom: 25px;
+}
+
+#restartBtn{
+    border: none;
+
+    padding: 14px 28px;
+
+    font-size: 18px;
+
+    border-radius: 12px;
+
+    cursor: pointer;
+
+    background: #22c55e;
+
+    color: white;
+
+    transition: 0.2s;
+}
+
+#restartBtn:hover{
+    transform: scale(1.05);
+
+    background: #16a34a;
 }
