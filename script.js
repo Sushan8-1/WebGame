@@ -19,7 +19,7 @@ let effects = [];
 let score = 0;
 let running = true;
 
-// ---------------- PLAYER ----------------
+// PLAYER
 
 const player = {
     x: canvas.width / 2,
@@ -67,7 +67,7 @@ const player = {
     }
 };
 
-// ---------------- BULLET ----------------
+//  BULLET 
 
 function Bullet(x, y, angle) {
     this.x = x;
@@ -90,7 +90,7 @@ function Bullet(x, y, angle) {
     };
 }
 
-// ---------------- ENEMY ----------------
+//  ENEMY 
 
 function Enemy() {
     let side = Math.floor(Math.random() * 4);
@@ -131,7 +131,7 @@ function Enemy() {
     };
 }
 
-// ---------------- PARTICLES ----------------
+//  PARTICLES 
 
 function Particle(x, y, color) {
     this.x = x;
@@ -162,7 +162,7 @@ function Particle(x, y, color) {
     };
 }
 
-// ---------------- STARS ----------------
+//  STARS 
 
 let stars = [];
 
@@ -192,7 +192,7 @@ function drawStars() {
     }
 }
 
-// ---------------- INPUT ----------------
+//  INPUT 
 
 window.addEventListener("keydown", e => {
     keys[e.key.toLowerCase()] = true;
@@ -215,7 +215,7 @@ window.addEventListener("click", () => {
     bullets.push(new Bullet(player.x, player.y, player.angle));
 });
 
-// ---------------- COLLISION ----------------
+//COLLISION
 
 function checkCollision(x1, y1, r1, x2, y2, r2) {
     let dx = x2 - x1;
@@ -223,13 +223,13 @@ function checkCollision(x1, y1, r1, x2, y2, r2) {
     return Math.sqrt(dx * dx + dy * dy) < r1 + r2;
 }
 
-// ---------------- SPAWN ----------------
+// SPAWN 
 
 setInterval(() => {
     if (running) enemies.push(new Enemy());
 }, 1000);
 
-// ---------------- GAME LOOP ----------------
+//GAME LOOP 
 
 function animate() {
     if (!running) return;
@@ -258,7 +258,7 @@ function animate() {
         }
     }
 
-    // enemies (FIXED LOOP)
+    // enemies
     for (let e = enemies.length - 1; e >= 0; e--) {
 
         enemies[e].update();
