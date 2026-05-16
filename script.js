@@ -11,6 +11,33 @@ const enemyUI = document.getElementById("enemyCount");
 const gameOverBox = document.getElementById("gameOver");
 const restartBtn = document.getElementById("restartBtn");
 
+const shootSound = new Audio("sounds/Shoot.mp3");
+const hitSound = new Audio("sounds/hit.mp3");
+const explosionSound = new Audio("sounds/Explosion.mp3");
+const bgMusic = new Audio("sounds/background.mp3");
+
+bgMusic.loop = true;
+bgMusic.volume = 0.3;
+
+shootSound.volume = 0.5;
+hitSound.volume = 0.5;
+explosionSound.volume = 0.7;
+
+window.addEventListener("click", () => {
+    if (!running) return;
+
+    // start music once
+    if (bgMusic.paused) {
+        bgMusic.play();
+    }
+
+    // shoot
+    bullets.push(new Bullet(player.x, player.y, player.angle));
+
+    shootSound.currentTime = 0;
+    shootSound.play();
+});
+
 let keys = {};
 let bullets = [];
 let enemies = [];
@@ -18,8 +45,6 @@ let effects = [];
 
 let score = 0;
 let running = true;
-
-// PLAYER
 
 const player = {
     x: canvas.width / 2,
@@ -67,8 +92,6 @@ const player = {
     }
 };
 
-//  BULLET 
-
 function Bullet(x, y, angle) {
     this.x = x;
     this.y = y;
@@ -89,8 +112,6 @@ function Bullet(x, y, angle) {
         ctx.fill();
     };
 }
-
-//  ENEMY 
 
 function Enemy() {
     let side = Math.floor(Math.random() * 4);
@@ -131,8 +152,6 @@ function Enemy() {
     };
 }
 
-//  PARTICLES 
-
 function Particle(x, y, color) {
     this.x = x;
     this.y = y;
@@ -161,8 +180,6 @@ function Particle(x, y, color) {
         ctx.globalAlpha = 1;
     };
 }
-
-//  STARS 
 
 let stars = [];
 
@@ -221,6 +238,7 @@ function checkCollision(x1, y1, r1, x2, y2, r2) {
     let dx = x2 - x1;
     let dy = y2 - y1;
     return Math.sqrt(dx * dx + dy * dy) < r1 + r2;
+
 }
 
 // SPAWN 
@@ -267,10 +285,15 @@ function animate() {
         // player hit
         if (
             checkCollision(
-                player.x, player.y, player.size,
-                enemies[e].x, enemies[e].y, enemies[e].size
+            player.x, player.y, player.size,
+            enemies[e].x, enemies[e].y, enemies[e].size
             )
+            
         ) {
+
+            hitSound.currentTime = 0;
+            hitSound.play();
+
             player.hp -= 1;
             if (player.hp < 0) player.hp = 0;
 
@@ -301,6 +324,9 @@ function animate() {
 
                 enemies.splice(e, 1);
                 bullets.splice(b, 1);
+
+                explosionSound.currentTime = 0;
+                explosionSound.play();
 
                 score += 10;
                 scoreUI.innerText = score;
